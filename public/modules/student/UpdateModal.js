@@ -1,28 +1,34 @@
 import React from "react";
-import {Modal,Button,Form,Input,Radio} from 'antd';
+import {Modal,Button,Form,Input,DatePicker,Upload,Icon} from 'antd';
 import {ajax} from 'tools';
 const FormItem = Form.Item;
-const RadioGroup = Radio.Group;
 class UpdateModal extends React.Component{
 	constructor(props){
 		super(props);
+		this.state={
+
+			indexImgList:[],
+			indexImgPath:this.props.indexImg
+		}
 	}
-	handleOk(){
+	componentWillReceiveProp(newProps){
+			this.setState({
+					indexImgPath:newProps.indexImgPath
+			});
+	}
+	handleok(){
 		var values=this.props.form.getFieldsValue();
-		values._id = this.props.thisStudent._id;
+		values._id= this.props.thisStudent._id;
+		// values.date = values.date.format("YYYY-MM-DD");
+		values.indexImg=JSON.stringify(this.state.indexImgPath);
 		console.log(values);
 		ajax({
-			type:'post',
-			url:'students/update',
+			type:'get',
+			url:'informations/update',
 			data:values,
 			success:function(){
-				Modal.success({
-						title:'OK',
-						content:"修改成功"
-					});
-
+				this.props.show();
 				this.props.handleCancel();
-				this.props.show()
 		}.bind(this)
 		})
 	}
@@ -31,51 +37,63 @@ class UpdateModal extends React.Component{
 		const formItemLayout = {
 			labelCol:{span:6},
 			wrapperCol:{span:9}
-		}
+		};
+
+		const props={
+			action:'/upload',
+			listType:'picture',
+			fileList:this.state.indexImgList,
+			onChange:function(data){
+				let fileList=data.fileList;
+				let indexPath=fileList.map(function(file){
+					console.log(file);
+					return file.response;
+				});
+				this.setState({
+					indexImgList:fileList,
+					indexImgPath:indexPath
+				});
+			}.bind(this)
+		};
 		return (
 			<div>
-				<Modal title="修改" visible={this.props.visible} onCancel={this.props.handleCancel} onOk={this.handleOk.bind(this)}>
-					<Form>
-					<FormItem
-					{...formItemLayout}
-					 label="姓名" hasFeedback>
-					 {getFieldDecorator('name')
-					 (<Input />)
-					 }
-					</FormItem>
-					<FormItem
-					{...formItemLayout}
-					 label="性别" hasFeedback>
-					 {getFieldDecorator('sex')
-					 (
-					 	<RadioGroup>
-					 	<Radio value={"男"}>男</Radio>
-					 	<Radio value={"女"}>女</Radio>
-					 	</RadioGroup>
+				<Modal title="修改" visible={this.props.visible} onCancel={this.props.handleCancel} onOk={this.handleok.bind(this)}>
 
-					 	)
-					 }
-					</FormItem>
-					<FormItem 
+				<Form>
+				<FormItem
+				{...formItemLayout}
+				label="图片" hasFeedback>
+				{getFieldDecorator('indexImg')
+				(<div><Upload {...props}>
+					 <Button><Icon type="upload"/>上传</Button>
+					 </Upload>
+				 </div>)}
+				</FormItem>
+					<FormItem
 					{...formItemLayout}
-					label="年龄" hasFeedback>
-					 {getFieldDecorator('age')
-					 (<Input />)
-					 }
+					 label="电影名" hasFeedback>
+					 {getFieldDecorator('title')
+					 (<Input />)}
 					</FormItem>
 					<FormItem
 					{...formItemLayout}
-					 label="成绩" hasFeedback>
-					 {getFieldDecorator('grade')
-					 (<Input />)
-					 }
+					 label="日期" hasFeedback>
+					 {getFieldDecorator('date')
+					 (<DatePicker />)}
+					</FormItem>
+
+					<FormItem
+					{...formItemLayout}
+					 label="详情" hasFeedback>
+					 {getFieldDecorator('content')
+					 (<Input />)}
 					</FormItem>
 				</Form>
-				
+
 				</Modal>
-				
+
 			</div>
-		
+
 		)
 	}
 }
@@ -83,13 +101,12 @@ export default Form.create(
 {
 	 mapPropsToFields(props){
 	 	return {
-			name:{value:props.thisStudent.name},
-			sex:{value:props.thisStudent.sex},
-			age:{value:props.thisStudent.age},
-			grade:{value:props.thisStudent.grade}
-
+			title:{value:props.thisStudent.title},
+			// date:{value:props.thisStudent.date},
+			indexImg:{value:props.thisStudent.indexImg},
+			content:{value:props.thisStudent.content}
 		}
 	}
-	
+
 }
 )(UpdateModal)

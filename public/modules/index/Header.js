@@ -52,7 +52,7 @@ export default class Header extends React.Component{
         }
         return (
                <header>
-                    <h1 style={{float:"left"}}>教务管理系统</h1>
+                    <h1 style={{float:"left"}}>猫眼管理系统</h1>
                     <ul style={{float:"right"}}>
                         <li style={{display:"inline-block"}}>{userinfo}</li>
                         &nbsp;

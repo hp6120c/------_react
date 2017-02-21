@@ -1,104 +1,113 @@
 import React from "react";
-import {Modal,Button,Form,Input,Radio} from 'antd';
+import {Modal,Button,Form,Input,DatePicker,Upload,Icon} from 'antd';
 import {ajax} from 'tools';
 const FormItem = Form.Item;
-const RadioGroup = Radio.Group;
 class AddModal extends React.Component{
 	constructor(props){
 		super(props);
 		this.state={
 			visible:false,
-			value:"女"
+			indexImgList:[],
+			indexImgPath:[]
 		}
 	}
 	add(){
-		console.log('增加');
+		// console.log('增加');
 		this.setState({
 			visible:true
 		})
 	}
 	handleok(){
-		console.log("handleok");
-		this.setState({
-			visible:false
-		});
-		this.props.form.validateFields((err,values)=>{
-			console.log(values)	
+			var data=this.props.form.getFieldsValue();
+			console.log(data);
+			data.date = data.date.format("YYYY-MM-DD");
+			data.indexImg=JSON.stringify(this.state.indexImgPath);
 			ajax({
 				type:'post',
-				url:'students/add',
-				data:values,
+				url:'informations/add',
+				data:data,
 				success:function(){
-					console.log('add suc');
+					// console.log('add suc');
+					this.setState({
+						visible:false
+					});
 					this.props.show()
 				}.bind(this)
 			})
-		})
 	}
 	handleCancel(){
-		console.log('handleCancel');
+		// console.log('handleCancel');
 		this.setState({
 			visible:false
 		})
 	}
-	onChange(event){
-		this.setState({
-			value:event.target.value
-		})
-	}
+	//点击性别的按钮
+	// onChange(event){
+	// 	this.setState({
+	// 		value:event.target.value
+	// 	})
+	// }
 	render(){
 		const {getFieldDecorator} = this.props.form;
 		const formItemLayout = {
 			labelCol:{span:6},
 			wrapperCol:{span:9}
-		}
+		};
+		const props={
+			action:'/upload',
+			listType:'picture',
+			fileList:this.state.indexImgList,
+			onChange:function(data){
+				let fileList=data.fileList;
+				let indexPath=fileList.map(function(file){
+					console.log(file);
+					return file.response;
+				});
+				this.setState({
+					indexImgList:fileList,
+					indexImgPath:indexPath
+				});
+			}.bind(this)
+		};
 		return (
 			<div>
 				<Button type="primary" onClick={this.add.bind(this)}>增加</Button>
 				<Modal title="增加" ref="son" test="test" visible={this.state.visible} onOk={this.handleok.bind(this)} onCancel={this.handleCancel.bind(this)}>
 
 				<Form>
+				<FormItem
+				{...formItemLayout}
+				label="图片" hasFeedback>
+				<div><Upload {...props}>
+					 <Button><Icon type="upload"/>上传</Button>
+					 </Upload>
+				 </div>
+				</FormItem>
 					<FormItem
 					{...formItemLayout}
-					 label="姓名" hasFeedback>
-					 {getFieldDecorator('name')
-					 (<Input />)
-					 }
+					 label="电影名" hasFeedback>
+					 {getFieldDecorator('title')
+					 (<Input />)}
 					</FormItem>
 					<FormItem
 					{...formItemLayout}
-					 label="性别" hasFeedback>
-					 {getFieldDecorator('sex')
-					 (
-					 	<RadioGroup onChange={this.onChange.bind(this)} setFieldsValue={this.state.value}>
-					 		
-					 	<Radio value={"男"}>男</Radio>
-					 	<Radio value={"女"}>女</Radio>
-					 	</RadioGroup>
+					 label="日期" hasFeedback>
+					 {getFieldDecorator('date')
+					 (<DatePicker />)}
+					</FormItem>
 
-					 	)
-					 }
-					</FormItem>
-					<FormItem 
-					{...formItemLayout}
-					label="年龄" hasFeedback>
-					 {getFieldDecorator('age')
-					 (<Input />)
-					 }
-					</FormItem>
 					<FormItem
 					{...formItemLayout}
-					 label="成绩" hasFeedback>
-					 {getFieldDecorator('grade')
-					 (<Input />)
-					 }
+					 label="详情" hasFeedback>
+					 {getFieldDecorator('content')
+					 (<Input />)}
 					</FormItem>
 				</Form>
 
 				</Modal>
-				
+
 			</div>
-		
+
 		)
 	}
 }

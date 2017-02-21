@@ -5,30 +5,33 @@ import AddModal from "AddModal";
 import {ajax} from "tools";
 const {Sider,Content} = Layout;
 // const {MenuItem} = Menu.Item;
-class Student extends React.Component{
+class Information extends React.Component{
 	constructor(props){
 		super(props);
 		this.state={
 			data:{
 				studentData:[]
-			},nowpage:""
+			},
+			rows:{}
 		}
 	}
 	 componentWillMount(){
         this.show();
     }
-	show(page,rows){
+	show(curpage,rows){
 		ajax({
 			type:"get",
-			url:"students/find",
+			url:"informations/find",
 			data:{
-				// page:page,rows:5
+				page:curpage,
+				rows:20
 			},
 			success:function(data){
-				console.log(data)
+				// console.log(data.rows)
 				this.setState({
 					data:{
-						studentData:data,
+						studentData:data.rows,
+						nowpage:curpage
 					}
 				})
 			}.bind(this)
@@ -39,14 +42,12 @@ class Student extends React.Component{
 				<Layout>
 					<Sider style={{backgroundColor:"white"}}>
 						<Menu  defaultSelectedKeys={['student']}>
-							<Menu.Item key="filmAndScreen">电影与院线匹配</Menu.Item>
-							<Menu.Item key="11">正在热映</Menu.Item>
-							<Menu.Item key="22">即将上映</Menu.Item>
-							<Menu.Item key="33">热播电影</Menu.Item>
-							<Menu.Item key="44">电影管理</Menu.Item>
-							<Menu.Item key="55">院线管理</Menu.Item>
-							<Menu.Item key="66">用户管理/登录/注销</Menu.Item>
-							<Menu.Item key="77">资讯管理</Menu.Item>
+							<Menu.Item key="filmAndScreen"><a href="#/FilmAndScreen">电影与院线匹配</a></Menu.Item>
+							
+							<Menu.Item key="films"><a href="#/films">电影管理</a></Menu.Item>
+							<Menu.Item key="screenings"><a href="#/screenings">院线管理</a></Menu.Item>
+						
+							<Menu.Item key="informations"><a href="#/informations">资讯管理</a></Menu.Item>
 						</Menu>
 					</Sider>
 					<div style={{paddingLeft:"90px"}}>
@@ -57,10 +58,10 @@ class Student extends React.Component{
 						<StudentTable show={this.show.bind(this)} studentData={this.state.data.studentData}>
 							{this.props.children}
 						</StudentTable>
-						
+
 					</div>
 				</Layout>
 		)
 	}
 }
-export {Student as default}
+export {Information as default}

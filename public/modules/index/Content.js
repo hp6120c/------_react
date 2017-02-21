@@ -12,7 +12,7 @@ export default React.createClass({
         				<OrgHeader router={this.props.router} style={{height:80}}></OrgHeader>
         			</Header>
                     
-		        	<Content style={{minHeight:400}}>{this.props.children}</Content>
+		        	<Content style={{minHeight:500}}>{this.props.children}</Content>
 		            <Footer style={{backgroundColor:"skyblue",height:80,lineHeight: '80px'}}>
 		            
 		            <OrgFooter></OrgFooter>

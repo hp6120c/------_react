@@ -4,12 +4,12 @@ import {ajax} from "tools";
 import UpdateModal from "UpdateModal";
 
 class StudentTable extends React.Component{
-	
+
 	constructor(props){
 		super(props);
 		this.state = {
 			visible:false,
-			thisStudent:{}
+			thisStudent:[]
 		}
 		this.props.show()
 	}
@@ -20,49 +20,53 @@ class StudentTable extends React.Component{
 	}
 
 	del(event){
-		console.log(event._id);
 		ajax({
 			type:'post',
-			url:'students/del',
+			url:'informations/del',
 			data:{
 				_id:event._id
 			},
 			success:function(){
-				console.log("del suc");
-				Modal.success({
-					title:"OK",
-					content:"删除成功"
-				})
 				this.props.show();
 			}.bind(this)
 		})
 	}
 	update(event){
+
 		this.setState({
 			visible:true,
 			thisStudent:event
 		})
-		console.log("修改")
-		console.log(event)
+		// console.log("修改")
+		//获取当前的数据
+		// console.log(event)
 
 	}
 	render() {
-		const columns =[{
-			title:'姓名',
-			dataIndex:'name',
-			key:'name'
+		const columns =[
+			{
+				title:'图片',
+				dataIndex:'indexImg',
+				key:'indexImg',
+				render:(record)=>{
+					// console.log(record);
+					return <img src={record}/>
+				}
+
+
+			},
+			{
+			title:'电影名',
+			dataIndex:'title',
+			key:'title'
 		},{
-			title:'性别',
-			dataIndex:'sex',
-			key:'sex'
+			title:'日期',
+			dataIndex:'date',
+			key:'date'
 		},{
-			title:'年龄',
-			dataIndex:'age',
-			key:'age'
-		},{
-			title:'成绩',
-			dataIndex:'grade',
-			key:'grade'
+			title:'详情',
+			dataIndex:'content',
+			key:'content'
 		},{
 			title:'操作',
 			dataIndex:'action',
@@ -74,17 +78,27 @@ class StudentTable extends React.Component{
 					<Button type="primary" onClick={()=>{this.del(record)}}>删除</Button>
 				</a>
 			}
-			
-		}]
-		const pagination = {
-			total:this.state.total,
-			defaultCurrent:1
-		}
+
+		}];
+		// const pagination = {
+		// 	total:this.props.studentData.length,
+		// 	showSizeChanger:true,
+		// 	onShowSizeChange:(curpage,maxpage)=>{
+		// 		console.log(curpage,maxpage);
+		// 	},
+		// 	onChange:(curpage)=>{
+		// 		console.log(curpage);
+		// 	}
+		// };
 		// this.show();
 		return (
 			<div>
-			<Table style={{width:'900px',backgroundColor:'white',marginTop:"20px"}} columns={columns} pagination={pagination} rowKey="_id"  dataSource={this.props.studentData} bordered></Table>
-			<UpdateModal show={this.props.show} thisStudent={this.state.thisStudent} studentData={this.props.studentData}  handleCancel={this.handleCancel.bind(this)} visible={this.state.visible}>{this.props.children}</UpdateModal>
+			<Table style={{width:'1000px',backgroundColor:'white',marginTop:"20px"}}
+			columns={columns} rowKey={record=>record._id} dataSource={this.props.studentData} bordered></Table>
+
+			<UpdateModal show={this.props.show} thisStudent={this.state.thisStudent}
+			studentData={this.props.studentData}  handleCancel={this.handleCancel.bind(this)}
+			visible={this.state.visible}>{this.props.children}</UpdateModal>
 			</div>
 		);
 	}
